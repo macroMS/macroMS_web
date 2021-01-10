@@ -1,0 +1,148 @@
+<html>
+
+<head>
+  <title>macroMS</title>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/plotly-latest.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/openseadragon.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/OpenSeadragonHTMLelements.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/jquery-3.1.1.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/openseadragonmagnifier.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/openseadragonselection.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/download.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/openseadragon-filtering.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/papaparse.min.js"></script>
+  <script src="https://tmacroms.s3.us-east-2.amazonaws.com/out_{{ ID }}/blobs_locations.js"></script>
+  <style>
+    input[type=text],
+    input[type=password] {
+
+
+      width: calc(100% - 20px);
+      padding: 3px;
+      border-radius: 3px;
+      margin: 3px;
+    }
+
+    button {
+      padding: 3px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4286f4;
+      color: white;
+      cursor: pointer;
+      margin: 3px;
+    }
+
+    .lab {
+      margin-left: 5px;
+      margin-right: 5px;
+
+    }
+
+    select {
+      margin-left: 5px;
+      margin-bottom: 5px;
+
+    }
+header {
+    width: 100%;
+    font-size:15px;
+    height: 20px; 
+ float: left;
+  background-color: black; 
+  text-align: left;
+  color: white;
+  padding-bottom: 2px;
+}
+
+
+/* Create two columns/boxes that floats next to each other */
+nav {
+  float: left;
+  width: 80%;
+  height: 95%; 
+  background: white;
+  color: white
+}
+
+ 
+
+article {
+  float: left;
+  font-size:15px;
+  height: 95%;
+  width: 20%;
+  background-color: #f1f1f1;
+ 
+ }
+
+ body {
+  padding: 0;
+  margin: 0;
+}
+  </style>
+</head>
+
+<body style="background:white">
+   <div id='container' style="width: 100% ">
+
+     <header>
+       <a  id="image_name" style='float:left;padding:5px' > </a> 
+      <a id='Satus_bar' style='float:right;padding-right:3%;padding-top:5px'></a>
+    </header>
+
+   <section>
+   <nav>
+    <div id="section1" style="height:100%;width:100%;float:left;display:inline;"></div>
+
+    <div id="section2" style="height:100%;width:100%;float:left;display:none; "></div>
+   </nav>
+
+   <article id='section2_1'> 
+      <br>
+      <div id="blobs" style='padding:5px'>
+        Find by blob ID<select id="Blobs" onclick='clearup2(1)' onchange='blob_action()' value=''>
+
+        </select>
+      </div>
+      <div id='blobgroup' style='padding:5px'>
+        Find by group ID<select id="Blobgroups" onclick='clearup2(2)' onchange='blobgroup_action()' value=''>
+        </select>
+      </div>
+      <br>
+      <div id='mode_selection' style='padding:5px'>
+      </div> 
+      <textarea id="Bloblist" onclick='clearup2(3)' rows="10" cols="30" style='margin:5px' title="Note: adding second column results in heatmap. For example, copying and pasting two columns of excel spreadsheet results in heatmap where the second column is used as heatmap color data for the box."></textarea><br>
+      <button onclick='show_multiple()'>Show samples</button> <br>
+
+      <div id="mzranges" style='padding:5px'>
+      </div>
+      <select id="x_range">
+        <option value="2.5">2.5</option>
+        <option value="1">1</option>
+        <option selected="selected" value="0.5">0.5</option>
+        <option value="0">0</option>
+      </select> <label for="x_range">+/- m/z range </label><br>
+
+      <button onclick='plot()'>Plot selected blob(s) </button><button onclick='revertimage()'>Back to image</button><br><br>
+      
+   </article> 
+   </section> 
+
+
+</div>
+
+ 
+  <script>
+    var folder_id="{{ ID }}" 
+  </script> 
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/macroMS_results.js"></script>
+
+
+
+ 
+
+ 
+</body>
+
+</html>

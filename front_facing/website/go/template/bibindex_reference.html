@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>macroMS</title>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/plotly-latest.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragon.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/OpenSeadragonHTMLelements.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/jquery-3.1.1.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragonmagnifier.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragonselection.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/download.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragon-filtering.js"></script>
+
+  <style>
+    input[type=text],
+    input[type=password] {
+
+
+      width: calc(100% - 20px);
+      padding: 3px;
+      border-radius: 3px;
+      margin: 3px;
+    }
+
+    button {
+      padding: 3px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4286f4;
+      color: white;
+      cursor: pointer;
+      margin: 3px;
+    }
+
+    .lab {
+      margin-left: 5px;
+      margin-right: 5px;
+
+    }
+
+    select {
+      border-radius: 3px;
+
+      margin: 3px;
+    }
+
+
+header {
+  width: 1125px;
+  font-size:15px;
+  float: left;
+  height: 20px;
+  background-color: black; 
+  text-align: left;
+  color: white;
+  padding-bottom: 2px;
+}
+
+/* Create two columns/boxes that floats next to each other */
+nav {
+  float: left;
+  height:650px;
+  width:725px;
+  background: white;
+  color: white
+}
+
+ 
+
+article {
+  float: left;
+  font-size:15px;
+  height: 650px;
+  width: 400px;
+  background-color: #f1f1f1;
+position: sticky;
+
+ }
+
+  </style>
+</head>
+
+<body style="background:white">
+  <div style="min-width: 1300px;margin:auto; background:white">
+
+    <header>
+      Edit blobs <input type='radio' name='interaction_choice' id='radiobutton1' onclick='radiobuttonf()'
+        checked>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Mark corners<input type='radio' name='interaction_choice' id='radiobutton2'
+        onclick='radiobuttonf()'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Box remove <input type='radio' name='interaction_choice' id='radiobutton3' onclick='radiobuttonf()'>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Navigation <input type='radio' name='interaction_choice' id='radiobutton4' onclick='radiobuttonf()'>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Filtering <input type='checkbox' id='radiobutton5' onclick='switch_filtering_mode()'>
+      View graph <input type='checkbox' id='radiobutton6' onclick='switch_view_mode()'>
+
+      <a id='Satus_bar' style='float:right;padding-right:10px;padding-top:5px'></a>
+
+    </header>
+
+  <section>
+  <nav>
+    <div id="section5" style="height:650px;width:100%;float:left;cursor:crosshair;display:inline;"></div>
+
+
+    <div id="section3" style="display:none;float:left;">
+
+      <div id="section3_1" style="height:650px;width:900px;cursor:crosshair "></div><br>
+      <div id="section3_2" style="height:650px;width:900px;cursor:crosshair "></div>
+
+    </div>
+  </nav>
+  <article id='art1'>
+    <div id='section1' style="height:650px;width:350px;float:left;display:inline">
+      <button onclick=update_blobs_status()>Count</button><button onclick=gu5()>Reset</button><button id='savepoint'
+        onclick=Savepoint()>Savepoint</button><br><br>
+
+          <a class='lab'> Color channel for threshold </a> 
+         <select id='threshold_color' onchange=update_threshold()>
+         <option value='-1'>No threshold</option>
+         <option value='0'>Gray</option>
+         <option value='1'>Red</option>
+         <option value='2'>Green</option>
+         <option value='3'>Blue</option>
+         <option value='4'>Gray-inverse</option>
+         <option value='5'>Red-inverse</option>
+         <option value='6'>Green-inverse</option>
+         <option value='7'>Blue-inverse</option>
+         </select> <button onclick='switch_to_reg()'>↕</button> <br>
+         <a class='lab'> Threshold </a>   
+        <input id='threshold_selector' type='range' min='1' max='255'   style='margin:0 auto' oninput=update_threshold()><a id='threshold_value'>128</a><br><br> 
+        
+
+
+
+
+
+      <a class='lab'>Minimal size of features:</a><a style="color:#808080">(Greater than 0) </a><br>
+      <input type="text" pattern="^[0-9]*$" id="minSize" value="10"><br>
+      <a class='lab'>Maximal size of features:</a><a style="color:#808080">(Greater than 0) </a><br>
+      <input type="text" pattern="^[0-9]*$" id="maxSize" value="2000"><br>
+      <a class='lab'>Minimal circularity of features:</a><a style="color:#808080">(0~1) </a><br>
+      <input type="text" pattern="^[0-9.]*$" id="minCircularity" value="0"><br>
+      <a class='lab' hidden>Color channel:</a><br hidden>
+      <input type="text" pattern="^[0-9]*$" id="colorChannel" value="2" hidden><br hidden>
+      <a class='lab' hidden >Threshold:</a><br hidden>
+      <input type="text" pattern="^[0-9]*$" id="threshold" value="75" hidden><br hidden>
+      <button id='Run_microms'>Perform feature finding</button> <br><br>
+ 
+
+
+ 
+      <a class='lab'>Number of rows in array</a><a style="color:#808080">(1&lt;) </a>
+      <input type="text" pattern="^[0-9]*$" id="RowN" required><br>
+      <a class='lab'>Number of columns in array</a><a style="color:#808080">(1&lt;) </a>
+      <input type="text" pattern="^[0-9]*$" id="ColN" required><br> 
+
+      <a class='lab'>Imaging method</a><br>
+
+      <select id="imagingtype">  
+        <option value="1"></option>
+        <option value="scanner">Scanner</option>
+        <option value="camera">Camera</option>
+      </select><br>
+ 
+
+      <button id="Gosubmit">Measure distortion</button><button id="download_measurement">Download measurement</button> <br><br><br>
+
+      <button id="Proceed" onclick=proceed()>Finalize & proceed</button><br><br>
+      <a class='lab'  >Image file name : {{ image_name }}</a>
+
+
+    </div>
+
+    <div id='section2' style="height:650px;width:350px;float:left;display:none;position:fixed;">
+      <div id='graphbuttons'>
+        <button name='filter_choice' value='1' onclick=filter_graph(0)>Size</button>&nbsp;
+        <button name='filter_choice' value='2' onclick=filter_graph(1)>Circularity</button>&nbsp;
+        <button name='filter_choice' value='3' onclick=filter_graph(2) id="Distance_button"
+          style="display:none;">Distance</button>&nbsp;
+        <button onclick='measure_distance()'
+          onmouseover="status_update('Can take longer than 1 min for &gt; 2000 blobs')" onmouseout="status_update('')"
+          id="Distance_button2" style="display:inline;">Set up distance filter</button>
+
+      </div>
+      <div id="plotly-div"></div>
+      <div id="filter_selections"></div>
+
+    </div>
+ </article>
+  </section>
+
+
+  </div>
+
+  <script>
+    var folder_id="{{ ID }}"
+    var token = '{{csrf_token}}';
+    var RefIMG = "{{ RefImg }}"
+    var image_name = "{{ image_name }}"
+
+  </script> 
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/macroMS_distortion.js"></script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-family: 'Lato', 'Arial', sans-serif;
+}
+
+h2 {
+  font-family: 'Lora', 'Georgia', serif;
+  font-weight: 700;
+  font-style: italic;
+  color: #e41a1c;
+}
+
+h3 {
+	font-family: 'Lora', 'Georgia', serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+h1 {
+	  font-family: 'Lora', 'Georgia', serif;
+  font-weight: 700;
+}
+
+h4 {
+	font-weight: 700;	
+}
+
+.jumbotron {
+  background-color: #e41a1c;
+  color: #ffffff;
+}
+
+.jumbolink {
+  color: #ffffff;
+}
+
+.jumbolink:hover {
+  color: #ffffff;
+  text-decoration: none;
+  text-decoration-color: #ffffff;
+}
+
+.jumbolink:visited {
+  color: #ffffff;
+}
+
+a {
+	color: #e41a1c;
+}
+
+a:visited {
+	color: #e41a1c;
+}
+
+a:hover {
+	color: #a50f15;
+}
+
+.smallc {
+	font-variant: small-caps;
+}
+

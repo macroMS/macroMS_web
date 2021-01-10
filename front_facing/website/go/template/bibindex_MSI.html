@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>macroMS</title>
+
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/plotly-latest.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragon.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/OpenSeadragonHTMLelements.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/jquery-3.1.1.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragonmagnifier.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragonselection.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/download.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragon-filtering.js"></script>
+  <style>
+    input[type=text],
+    input[type=password] {
+
+
+      width: calc(100% - 20px);
+      padding: 3px;
+      border-radius: 3px;
+      margin: 3px;
+    }
+
+    button {
+      padding: 3px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4286f4;
+      color: white;
+      cursor: pointer;
+      margin: 3px;
+    }
+
+    .lab {
+      margin-left: 5px;
+      margin-right: 5px;
+
+    }
+
+    select {
+      margin-left: 5px;
+      margin-bottom: 5px;
+
+    }
+  </style>
+</head>
+
+<body style="background:white">
+  <div style="min-width: 1150px;margin:auto; background:white">
+    <div style="width: 1150px;height:30px;background-color:black;color:white;">
+      Edit blobs <input type='radio' name='interaction_choice' id='radiobutton1' onclick='radiobuttonf()'
+        checked>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Edit fiducials <input type='radio' name='interaction_choice' id='radiobutton2'
+        onclick='radiobuttonf()'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ROI remove <input type='radio' name='interaction_choice' id='radiobutton3' onclick='radiobuttonf()'>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Navigation <input type='radio' name='interaction_choice' id='radiobutton4' onclick='radiobuttonf()'>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Filtering <input type='checkbox' id='radiobutton5' onclick='switch_filtering_mode()'>
+
+      <a id='Satus_bar' style='float:right;padding-right:10px;padding-top:5px'></a>
+
+    </div>
+    <div id="foo" style="height:650px;width:800px;float:left;cursor:crosshair;"></div>
+    <div id='section1' style="background-color:#eee;height:650px;width:350px;float:left;display:inline;">
+      <input type="checkbox" id="Image_Threasholding" name="Image_Threasholding" onclick='Image_Threasholding()'>
+      <label for="Image_Thresholding"> Image thresholding </label>
+      <a id='Threshold_range'></a><br><br>
+      <a class='lab'>Minimal size of features</a><a style="color:#808080">(Greater than 0) </a><br>
+      <input type="text" pattern="^[0-9]*$" id="minSize" value="100"><br>
+      <a class='lab'>Maximal size of features</a><a style="color:#808080">(Greater than 0) </a><br>
+      <input type="text" pattern="^[0-9]*$" id="maxSize" value="5000"><br>
+      <a class='lab'>Minimal circularity of features</a><a style="color:#808080">(0~1) </a><br>
+      <input type="text" pattern="^[0-9.]*$" id="minCircularity" value="0"><br>
+      <a class='lab'>Threshold</a><a style="color:#808080">(0~200) </a><br>
+      <input type="text" pattern="^[0-9]*$" id="threshold" value="75"><br>
+      <a class='lab'>Color channel</a>
+      <select id="colorChannel">
+        <option value="2">Blue</option>
+        <option value="0">Red</option>
+        <option value="1">Green</option>
+
+      </select> <br>
+
+      <button id='Run_microms'>Perform feature finding</button> <br><br>
+
+      <input type="text" pattern="^[0-9.]*$" id="W_H_Ratio" value="3" hidden>
+      <a class='lab'>Offset for circular packing:</a><a style="color:#808080">(-2,-1,0,1,2) </a>
+      <input type="text" pattern="^-?[0-9]*$" id="pack_offset" value="-1"><br>
+      <button id='circular_pack'>Circular pack</button> <br><br>
+
+
+      <div id='section6'>
+        <button onclick=update_blobs_status()>Count</button><button onclick=gu5()>Reset</button><button id='savepoint'
+          onclick=Savepoint()>Save</button>
+      </div> <br>
+      <a class='lab' onmouseover="status_update('4 fiducials are required for a camera image')"
+        onmouseout="status_update('')">Glass width/height if image is from camera :</a>
+
+      <input type="text" id="adjust_dimensions" name="adjust_dimensions" pattern="^[0-9.]*$"
+        placeholder="Width divided by height" onmouseover="status_update('4 fiducials are required for a camera image')"
+        onmouseout="status_update('')"><br>
+      <input type="checkbox" id="horizontal_flip_geometry" name="geometry_options"
+        onmouseover="status_update('For case when glass+sample is imaged from bottom up')"
+        onmouseout="status_update('')">
+      <label for="geometry_options" onmouseover="status_update('For case when glass+sample is imaged from bottom up')"
+        onmouseout="status_update('')"> Mirror across vertical axis</label><br>
+      <input type="checkbox" id="TSO_geometry" name="geometry_options"
+        onmouseover="status_update('Highly recommedned for &gt; 5,000 blobs. Takes 1 minute for 2,000~12,000')"
+        onmouseout="status_update('')">
+      <label for="geometry_options"
+        onmouseover="status_update('Highly recommedned for &gt; 5,000 blobs. Takes 1 minute for 2,000~12,000')"
+        onmouseout="status_update('')"> MALDI path optimization </label><br>
+      <select id="platetype">
+        <option value="1"></option>
+        <option value="TLC">MTP TLC Plate</option>
+        <option value="PAC">PAC 384 Plate</option>
+      </select>
+      <label for="platetype"> MALDI plate type </label><br>
+
+      <select id="MSI_dilation">
+        <option value="None">No MSI</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+
+      </select>
+      <label for="MSI_dilation"> Dilation if MSI mode</label><br>
+
+      <button id='geometryf'>Generate MALDI coordinate file</button><br><br>
+
+
+
+    </div>
+
+    <div id='section2' style="background-color:#eee;height:650px;width:350px;float:left;display:none;">
+      <div id='graphbuttons'>
+        <button name='filter_choice' value='1' onclick=filter_graph(0)>Size</button>&nbsp;
+        <button name='filter_choice' value='2' onclick=filter_graph(1)>Circularity</button>&nbsp;
+        <button name='filter_choice' value='3' onclick=filter_graph(2) id="Distance_button"
+          style="display:none;">Distance</button>&nbsp;
+        <button onclick='measure_distance()'
+          onmouseover="status_update('Can take longer than 1 min for &gt; 2,000 blobs')" onmouseout="status_update('')"
+          id="Distance_button2" style="display:inline;">Set up distance filter</button>
+
+      </div>
+      <div class='lab' id="plotly-div"></div>
+      <div id="filter_selections"></div>
+
+
+    </div>
+  </div>
+  <script>
+
+    var filter_selections = "   <a class='lab' id='mincut_label'>Minimum:</a><input type='text' pattern='^[0-9.-]*$' id='mincut' size='5'><br><a class='lab' id='maxcut_label'>Maximum:</a><input type='text' pattern='^[0-9.-]*$' id='maxcut' size='5' ><br><button onclick='update_filtered_blobs(1)'>View filtered</button> <button onclick='update_filtered_blobs(3)'>Revert </button><button onclick='update_filtered_blobs(2)'>Finalize</button> "
+    var RefIMG = "{{ RefImg }}"
+    var token = '{{csrf_token}}';
+
+    if (RefIMG == 2) {
+      document.getElementById('section6').innerHTML = "<button onclick=update_blobs_status()>Count</button><button onclick=gu5()>Reset</button><button id='savepoint' onclick=Savepoint()>Save</button><button id='show_corners'>Put reference corner points </button>"
+
+    }
+    if (RefIMG == 2) {
+    status_update('Session ends in 1 hour. Features outside of the correction area will be ignored' )
+    }else{
+    status_update('Session ends in 1 hour')
+
+    } 
+    window.setTimeout(function () {
+      window.location.href = '17'
+    }, 3600 * 1000)
+
+
+
+
+    document.getElementById("Image_Threasholding").checked = false
+    function Image_Threasholding() {
+      var threshold_switch = document.getElementById("Image_Threasholding");
+      if (threshold_switch.checked == true) {
+        document.getElementById('Threshold_range').innerHTML = " <input id='threshold_selector' type='range' min='1' max='255' oninput=update_threshold()><a id='threshold_value'>127</a><br> <input type='checkbox' id='inverse_image' name='inverse_image' onclick=update_threshold()>    <label for='inverse_image'> Inverse image </label>"
+        document.getElementById('threshold_selector').value = threshold_saved_value
+        document.getElementById('inverse_image').checked = inverse_switch_saved
+        update_threshold()
+      } else {
+        document.getElementById('Threshold_range').innerHTML = ''
+        viewer.setFilterOptions({
+          filters: {
+            processors: []
+          },
+        });
+      }
+    }
+    function update_threshold() {
+      var threshold = document.getElementById('threshold_selector').value;
+      document.getElementById('threshold_value').innerText = threshold;
+      var procrs = [OpenSeadragon.Filters.THRESHOLDING(threshold)]
+      if (document.getElementById('inverse_image').checked) {
+        procrs.push(OpenSeadragon.Filters.INVERT())
+      }
+      viewer.setFilterOptions({
+        filters: {
+          processors: procrs
+        },
+        loadMode: 'sync'
+      });
+      threshold_saved_value = threshold;
+      inverse_switch_saved = document.getElementById('inverse_image').checked
+    }
+
+
+    function filter_graph(choice) {
+
+      var blobs = blobs_before_filter
+      if (blobs.length < 2) {
+        alert('At least two or more blobs are required')
+        return 0
+      }
+
+      if (somethingisrunning == true) {
+        alert("This submission is ignored, server is still processing the previous submission! Please avoid double clicking on the button, or clicking the button before another job is finished. (i.e. clicking Circular Pack button right after clicking Run microMS button is prohibited)")
+        return 0
+      }
+
+      document.getElementById('filter_selections').innerHTML = filter_selections
+
+      filter_switch = choice + 1
+      var data = []
+      for (var i = 0, n = blobs.length; i < n; ++i) {
+        dat = blobs[i].split('and')[parseInt(filter_switch) + 2]
+        if (filter_switch == 1) {
+          dat = (dat / 2) * (dat / 2) * Math.PI
+        }
+        data.push(dat)
+      }
+      var trace = {
+        x: data,
+        type: 'histogram',
+      };
+      var data = [trace];
+      var layout = {
+        title: ['Size vs Counts', 'Circularity vs Counts', 'Distance vs Counts'][choice],
+        margin: {
+          l: 30,
+          r: 30,
+          t: 80,
+          b: 30,
+        }, yaxis: {
+          fixedrange: true
+        },
+        bargap: 0,
+      };
+
+      Plotly.newPlot('plotly-div', data, layout, { scrollZoom: true, displaylogo: false, doubleClickDelay: 1000, modeBarButtonsToRemove: ['toImage', 'sendDataToCloud', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'select2d', 'autoScale2d', 'toggleSpikelines'] });
+
+
+      var graphDiv = document.getElementById('plotly-div');
+      graphDiv.on('plotly_relayout',
+        function (eventdata) {
+          x1 = eventdata['xaxis.range[0]'];
+          x2 = eventdata['xaxis.range[1]'];
+          if (isNumeric(x1) && isNumeric(x2)) {
+            document.getElementById('mincut').value = String(x1)
+            document.getElementById('maxcut').value = String(x2)
+          }
+        });
+      document.getElementById('mincut_label').innerText = ['Size min:', 'Circularity min:', 'Distance min:'][filter_switch - 1]
+      document.getElementById('mincut').value = ''
+      document.getElementById('maxcut_label').innerText = ['Size max:', 'Circularity max:', 'Distance max:'][filter_switch - 1]
+      document.getElementById('maxcut').value = ''
+    }
+    function update_filtered_blobs(mode) {
+      var mincut = parseFloat(document.getElementById('mincut').value)
+      var maxcut = parseFloat(document.getElementById('maxcut').value)
+      if (filter_switch == 1) {
+        mincut = Math.sqrt(mincut / Math.PI) * 2
+        maxcut = Math.sqrt(maxcut / Math.PI) * 2
+      }
+      if (mode == 1) {
+        var blobs = blobs_before_filter
+        filtered_out_save = []
+        var filteredin = []
+        for (var i = 0, n = blobs.length; i < n; ++i) {
+          dat = parseFloat(blobs[i].split('and')[parseInt(filter_switch) + 2])
+          if (mincut > dat || dat > maxcut) {
+            filtered_out_save.push(blobs[i])
+          } else {
+            filteredin.push(blobs[i])
+          }
+
+        }
+        purge_blobs()
+        gu2(filteredin, true)
+        status_update(String(filteredin.length) + ' blobs out of ' + String(blobs_before_filter.length) + " blobs selected.")
+
+      }
+
+      if (mode == 2) {
+        blobs_before_filter = find_true_added_blobs()
+        document.getElementById("plotly-div").innerHTML = ''
+        status_update('')
+      }
+
+      if (mode == 3) {
+        purge_blobs()
+        gu2(blobs_before_filter, true)
+        status_update('')
+      }
+    }
+
+
+
+
+
+    $(document).ready(function () {
+      $("#Run_microms").click(function (event) {
+        var checklist = [isNumeric($("#minSize").val()), isNumeric($("#maxSize").val()), isNumeric($("#minCircularity").val()), isNumeric($("#colorChannel").val()), isNumeric($("#threshold").val())]
+
+        if (checklist.includes(false)) {
+          alert('The input paramters includes non-numeric or empty entry. Run terminated.')
+          return 0
+        }
+
+        if (somethingisrunning == false) {
+          somethingisrunning = true
+          status_update('Finding blobs..')
+          var image_threshold = 0;
+          var threshold_switch = document.getElementById("Image_Threasholding").checked;
+          if (threshold_switch == true) {
+            var inverse_switch = document.getElementById("inverse_image").checked;
+
+            if (inverse_switch == false) {
+              image_threshold = document.getElementById('threshold_selector').value;
+            }
+            else {
+              image_threshold = document.getElementById('threshold_selector').value * -1;
+            }
+          }
+
+          status_update('Finding blobs..')
+
+          $.ajax({
+            url: "6",
+            method: "GET",
+            data: {
+
+              dziid: "{{ ID }}",
+              minSize: $("#minSize").val(),
+              maxSize: $("#maxSize").val(),
+              minCircularity: $("#minCircularity").val(),
+              colorChannel: $("#colorChannel").val(),
+              threshold: $("#threshold").val(),
+              image_threshold: image_threshold,
+              refIMG: RefIMG,
+
+            },
+            dataType: "html",
+            success: function (response_text) {
+              somethingisrunning = false
+              if (response_text.length > 0) {
+                var S = response_text.split('end');
+                gu4(false);
+                gu2(S, false);
+                blobs_before_filter = find_true_added_blobs()
+                ispacked = false;
+                status_update('microMS found ' + S.length.toString() + ' blobs')
+              }
+              else {
+                status_update('')
+                alert('No feature could be found with the given search parameters')
+              }
+
+
+            },
+            error: function (jqXHR, exception) {
+              status_update('')
+              somethingisrunning = false
+              var msg = '';
+              if (jqXHR.status === 0) {
+                msg = 'No connection. Verify network';
+              } else if (jqXHR.status == 404) {
+                msg = 'Requested page not found [404]';
+              } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+              } else if (exception === 'parsererror') {
+                msg = 'Requested parse failed.';
+              } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+              } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+              } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+              }
+              alert(msg);
+            },
+            timeout: 250000,
+
+          });
+
+
+        } else { alert("This submission is ignored, server is still processing the previous submission!  Please avoid double clicking on the button, or clicking the button before another job is finished. (i.e. clicking Circular Pack button right after clicking Run microMS button is prohibited)") }
+
+      });
+
+
+      $("#circular_pack").click(function () {
+        if (isNumeric($("#pack_offset").val()) == false) {
+          alert('The input paramters includes non-numeric or empty entry. Run terminated.')
+          return 0
+        }
+        if (ispacked == true) {
+          alert('Circular packing cannot performed on already packed blobs. Click the reset blobs/fiducials button to pack new blobs')
+          return 0
+        }
+        var blobs = find_true_added_blobs()
+
+        if (blobs.length != 0) {
+          if (somethingisrunning == false) {
+            somethingisrunning = true
+            status_update('Packing blobs..')
+
+            $.ajax({
+              headers: { "X-CSRFToken": token },
+              url: "7",
+              method: "POST",
+              data: {
+                csrf: token,
+                dziID: "{{ ID }}",
+                offset: $("#pack_offset").val(),
+                blob_added: blobs.join('end'),
+              },
+              dataType: "html",
+              success: function (response_text) {
+
+                somethingisrunning = false
+                status_update('Packing finished ')
+                var S = response_text.split('end');
+                gu4(false);
+                gu2(S, false);
+                blobs_before_filter = find_true_added_blobs()
+
+                ispacked = true
+                status_update('Packing resulted ' + S.length.toString() + ' blobs')
+
+
+              },
+              error: function (jqXHR, exception) {
+                status_update('')
+                somethingisrunning = false
+                var msg = '';
+                if (jqXHR.status === 0) {
+                  msg = 'No connection. Verify network';
+                } else if (jqXHR.status == 404) {
+                  msg = 'Requested page not found [404]';
+                } else if (jqXHR.status == 500) {
+                  msg = 'Internal Server Error [500].';
+                } else if (exception === 'parsererror') {
+                  msg = 'Requested parse failed.';
+                } else if (exception === 'timeout') {
+                  msg = 'Time out error.';
+                } else if (exception === 'abort') {
+                  msg = 'Ajax request aborted.';
+                } else {
+                  msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                }
+                alert(msg);
+              },
+              timeout: 250000,
+            });
+          } else { alert("This submission is ignored, server is still processing the previous submission! Please avoid double clicking on the button, or clicking the button before another job is finished. (i.e. clicking Circular Pack button right after clicking Run microMS button is prohibited)") }
+        } else { alert("At least one blob is needed") }
+
+      });
+
+
+
+      $("#geometryf").click(function () {
+        var blobs = find_true_added_blobs()
+        var fiducials = find_true_fiducials()
+        var adjust_dimension_switch = isNumeric($("#adjust_dimensions").val())
+
+        var platetype = document.getElementById('platetype').value
+
+        if (platetype == '1') {
+          alert('Please select MALDI plate type')
+          return 0
+        }
+
+
+        if ($("#TSO_geometry").is(":checked") == true && blobs.length > 12000) {
+          alert('MALDI path optimization cannot be performed on more than 12,000 blobs!')
+          return 0
+        }
+        if (adjust_dimension_switch == false && $("#adjust_dimensions").val() != '') {
+          alert('The input box includes non-number value, including emtpy space created by the space key. Please remove non-number characters. Run terminated.')
+          return 0
+        }
+        if ($("#adjust_dimensions").val() == '') {
+          if (blobs.length == 0 || fiducials.length != 3) {
+            alert("Coordinate file generation requires three fiducial points and at least one blob ")
+            return
+          }
+        }
+
+        else {
+          if (blobs.length == 0 || fiducials.length != 4) {
+
+            alert("Four fiducial points and at least one blob are required for coordinate file generation with camera perspective correction")
+            return
+          }
+        }
+        var image_threshold = 0;
+
+        if(document.getElementById('MSI_dilation').value!='None'){  
+          var threshold_switch = document.getElementById("Image_Threasholding").checked;
+          if (threshold_switch == true) {
+            var inverse_switch = document.getElementById("inverse_image").checked;
+
+            if (inverse_switch == false) {
+              image_threshold = document.getElementById('threshold_selector').value;
+            }
+            else {
+              image_threshold = document.getElementById('threshold_selector').value * -1;
+            }
+          }else{
+          alert('MSI mode requires thresholded image')
+          return
+          }
+
+
+          }
+
+
+        if (somethingisrunning == false) {
+          somethingisrunning = true
+          status_update('Generating output file.. 1 minute for 2,000~12,000 blobs for path optimization')
+          $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: "5",
+            method: "POST",
+            data: {
+              csrf: token,
+              blob_added: blobs.join('end'),
+              fiducial_added: fiducials.join('end'),
+              dziID: "{{ ID }}",
+              horizontal_flip_geometry: $("#horizontal_flip_geometry").is(":checked"),
+              TSO_geometry: $("#TSO_geometry").is(":checked"),
+              adjust_dimensions: $("#adjust_dimensions").val(),
+              refIMG: RefIMG,
+              Platetype: platetype,
+              image_threshold: image_threshold,
+  
+            },
+            dataType: "html",
+            success: function (responseText) {
+              somethingisrunning = false
+              status_update('')
+
+              download(responseText, "out.xeo", "text/plain");
+            },
+            error: function (jqXHR, exception) {
+              status_update('')
+              somethingisrunning = false
+              var msg = '';
+              if (jqXHR.status === 0) {
+                msg = 'No connection. Verify network';
+              } else if (jqXHR.status == 404) {
+                msg = 'Requested page not found [404]';
+              } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+              } else if (exception === 'parsererror') {
+                msg = 'Requested parse failed.';
+              } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+              } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+              } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+              }
+              alert(msg);
+            },
+            timeout: 250000,
+
+          });
+        } else { alert("This submission is ignored, server is still processing the previous submission!  Please avoid double clicking on the button, or clicking the button before another job is finished. (i.e. clicking Circular Pack button right after clicking Run microMS button is prohibited)") }
+      });
+
+
+      $("#show_corners").click(function (event) {
+
+        var corners = find_true_refcorners()
+        if (corners.length > 0) {
+          return
+        }
+        if (somethingisrunning == false) {
+          somethingisrunning = true
+        }
+        else {
+          alert("This submission is ignored, server is still processing the previous submission!  Please avoid double clicking on the button, or clicking the button before another job is finished.  ")
+          return
+        }
+
+        $.ajax({
+          url: "16",
+          method: "GET",
+          data: {
+
+            dziid: "{{ ID }}",
+
+          },
+          dataType: "html",
+          success: function (response_text) {
+
+            var points = response_text.split('\n')
+            points = points.slice(0, points.length - 1)
+
+
+            somethingisrunning = false
+            for (var i = 0, n = points.length; i < n; ++i) {
+              add_reference_marks(parseFloat(points[i].split('\t')[0]), parseFloat(points[i].split('\t')[1]))
+            }
+
+            document.getElementById('show_corners').style.display = 'none';
+
+          },
+          error: function (jqXHR, exception) {
+            status_update('')
+            somethingisrunning = false
+            var msg = '';
+            if (jqXHR.status === 0) {
+              msg = 'No connection. Verify network';
+            } else if (jqXHR.status == 404) {
+              msg = 'Requested page not found [404]';
+            } else if (jqXHR.status == 500) {
+              msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+              msg = 'Requested parse failed.';
+            } else if (exception === 'timeout') {
+              msg = 'Time out error.';
+            } else if (exception === 'abort') {
+              msg = 'Ajax request aborted.';
+            } else {
+              msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            }
+            alert(msg);
+          },
+          timeout: 250000,
+
+
+        });
+
+
+
+      });
+
+    });
+    var ismouseover = 0;
+    var mag = 0.0001;
+    var isrect = 0;
+    var blob_radio_selected = true
+    var fiducial_radio_selected = false
+    var roiremove_radio_selected = false
+    var somethingisrunning = false
+    var TIF_image_pixel_size_X = ''
+    var TIF_image_pixel_size_Y = ''
+    var boxsize = ''
+    var ispacked = false
+    var filter_switch = 0
+    var blobs_before_filter = []
+    var savepoint_blobs = []
+    var savepoint_fiducials = []
+
+    var savepoint_ispacked = false
+
+    var threshold_saved_value = 128
+    var inverse_switch_saved = false
+
+
+
+    function remove_element(ID) {
+      const e = hEl.getElementById(ID)
+      var ID = e.id.split('and')
+      hEl.elements.splice(hEl.elements.indexOf(e), 1)
+    }
+
+    function remove_element_by_click(ID) {
+      const e = hEl.getElementById(ID)
+      var ID = e.id.split('and')
+      hEl.elements.splice(hEl.elements.indexOf(e), 1)
+      if (fiducial_radio_selected == true) {
+
+        if (ID[6] == 'B') {
+          add_fiducial(parseFloat(ID[0]), parseFloat(ID[1]), parseFloat(ID[2]), parseFloat(ID[3]), ID[4], ID[5], 'F', ID[7])
+        }
+      }
+    }
+    function status_update(Message) {
+
+      document.getElementById('Satus_bar').innerHTML = Message
+
+    }
+    function update_blobs_status() {
+      var blobs = find_true_added_blobs()
+      var fiducials = find_true_fiducials()
+
+      status_update(blobs.length.toString() + ' blobs and ' + fiducials.length.toString() + ' fiducials counted')
+    }
+    function gu2(Lis, reuse_switch) {
+      if (reuse_switch == false) {
+        for (var count = 0, n = Lis.length; count < n; ++count) {
+          var LisLis = Lis[count].split('and');
+          var X = parseFloat(LisLis[0]);    ///X position in pixel 
+          var Y = parseFloat(LisLis[1]);    ///Y position in pixel
+          var w = parseFloat(LisLis[2]) * 2;///weight
+          var h = parseFloat(LisLis[3]) * 2;///height
+          var c = parseFloat(LisLis[4]);///circularity
+          var d = parseFloat(LisLis[5]);///Distance
+          var i = LisLis[6];            ///identity=fiducial or blob
+          var g = parseInt(LisLis[7]);  ///group from circularity 
+          gu3(X - w / 2, Y - h / 2, w, h, c, d, i, g);
+        }
+      } else {
+        for (var count = 0, n = Lis.length; count < n; ++count) {
+          var LisLis = Lis[count].split('and');
+          var X = parseFloat(LisLis[0]);
+          var Y = parseFloat(LisLis[1]);
+          var w = parseFloat(LisLis[2]);
+          var h = parseFloat(LisLis[3]);
+          var c = parseFloat(LisLis[4]);
+          var d = parseFloat(LisLis[5]);
+          var i = LisLis[6];
+          var g = parseInt(LisLis[7]);
+          gu3(X, Y, w, h, c, d, i, g);
+
+
+        }
+
+      }
+    };
+
+
+
+    function gu3(X, Y, w, h, c, d, i, g) {
+
+      if (w < 1 || h < 1) {
+        return
+      }
+      if (X + w / 2 < 0 || TIF_image_pixel_size_X < X + w / 2 || Y + h / 2 < 0 || TIF_image_pixel_size_Y < Y + h / 2) {
+        return null
+      }
+
+      var sq = document.createElement("div")
+      sq.style = "box-sizing: border-box;border:solid 2px #3cff33"
+      var ID = String(X) + 'and' + String(Y) + 'and' + String(w) + 'and' + String(h) + 'and' + String(c) + 'and' + String(d) + 'and' + String(i) + 'and' + String(g)
+      hEl.addElement({
+        id: ID,
+        element: sq,
+        x: X,
+        y: Y,
+        width: w,
+        height: h,
+      });
+      mag = -mag
+      viewer.viewport.zoomTo(viewer.viewport.getZoom(true) + mag)
+    };
+
+    function add_fiducial(X, Y, w, h, c, d, i, g) {
+      if (X + w / 2 < 0 || TIF_image_pixel_size_X < X + w / 2 || Y + h / 2 < 0 || TIF_image_pixel_size_Y < Y + h / 2) {
+        return null
+      }
+      var sq = document.createElement("div")
+
+      sq.style = "box-sizing: border-box;border:solid 2px red"
+
+
+      var ID = String(X) + 'and' + String(Y) + 'and' + String(w) + 'and' + String(h) + 'and' + String(c) + 'and' + String(d) + 'and' + String(i) + 'and' + String(g)
+      hEl.addElement({
+        id: ID,
+        element: sq,
+        x: X,
+        y: Y,
+        width: w,
+        height: h,
+      });
+      mag = -mag
+      viewer.viewport.zoomTo(viewer.viewport.getZoom(true) + mag)
+    };
+
+    function add_reference_marks(X, Y) {
+      var sq = document.createElement("div")
+      sq.style = 'background-color:rgb(255,255,0)'
+      var ID = String(X) + 'and' + String(Y) + 'and' + String(10) + 'and' + String(10) + 'and' + String(1) + 'and' + String(0) + 'and' + String('C') + 'and' + String(0)
+      hEl.addElement({
+        id: ID,
+        element: sq,
+        x: X - 1.5,
+        y: Y - 1.5,
+        width: 3,
+        height: 3,
+      });
+      mag = -mag
+      viewer.viewport.zoomTo(viewer.viewport.getZoom(true) + mag)
+    };
+
+
+
+
+
+    function isNumeric(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    function find_true_added_blobs() {
+      var blobelements = hEl.elements;
+      var blobelementsid = []
+      for (var i = 0, n = blobelements.length; i < n; ++i) {
+
+        if (blobelements[i].id.split('and')[6] == 'B') {
+          blobelementsid.push(blobelements[i].id)
+        }
+      }
+
+      return blobelementsid
+    }
+
+    function find_true_fiducials() {
+      var fiducialelements = hEl.elements;
+      var fiducialelementsid = []
+      for (var i = 0, n = fiducialelements.length; i < n; ++i) {
+        if (fiducialelements[i].id.split('and')[6] == 'F') {
+          fiducialelementsid.push(fiducialelements[i].id)
+        }
+      }
+      return fiducialelementsid
+    }
+
+    function find_true_refcorners() {
+      var fiducialelements = hEl.elements;
+      var fiducialelementsid = []
+      for (var i = 0, n = fiducialelements.length; i < n; ++i) {
+        if (fiducialelements[i].id.split('and')[6] == 'C') {
+          fiducialelementsid.push(fiducialelements[i].id)
+        }
+      }
+      return fiducialelementsid
+    }
+
+    function remove_ROI_elements(X, Y, width, height) {
+      var arr1 = find_true_added_blobs()
+      var arr2 = find_true_fiducials()
+      var added = arr1.concat(arr2)
+      var ROIremovelist = []
+      for (var i = 0, n = added.length; i < n; ++i) {
+        G = added[i].split('and');
+        var x = Number(G[0]), y = Number(G[1]), w = Number(G[2]), h = Number(G[3]);
+        var x_pos = x + w / 2
+        var y_pos = y + h / 2
+        if (X < x_pos && x_pos < X + width && Y < y_pos && y_pos < Y + height) {
+          ROIremovelist.push(added[i])
+        }
+      }
+
+      hEl.removeElementsById(ROIremovelist)
+    }
+
+    function gu4(remove_fiducials) {
+      var S = find_true_added_blobs()
+      var F = find_true_fiducials()
+      if (S.length > 0) {
+        hEl.removeElementsById(S)
+      }
+      if (remove_fiducials == true && F.length > 0) {
+        hEl.removeElementsById(F);
+      }
+
+    };
+
+    function gu5() {
+      ispacked = false
+      gu4(true)
+      status_update('Blobs and fiducials are reset')
+
+    }
+
+    function add_fiducials(Lis) {
+      for (var count = 0, n = Lis.length; count < n; ++count) {
+        var LisLis = Lis[count].split('and');
+        var X = parseFloat(LisLis[0]);
+        var Y = parseFloat(LisLis[1]);
+        var w = parseFloat(LisLis[2]);
+        var h = parseFloat(LisLis[3]);
+        var c = parseFloat(LisLis[4]);
+        var d = parseFloat(LisLis[5]);
+        var i = LisLis[6];
+        var g = parseInt(LisLis[7]);
+
+
+      }
+    }
+
+    function Savepoint() {
+      if (document.getElementById('savepoint').innerHTML == 'Save') {
+        document.getElementById('savepoint').innerHTML = 'Revert'
+        savepoint_blobs = find_true_added_blobs()
+        savepoint_fiducials = find_true_fiducials()
+        savepoint_ispacked = ispacked
+        status_update(String(savepoint_blobs.length) + ' blobs and ' + String(savepoint_fiducials.length) + ' fiducials are saved')
+
+        return 0
+      }
+      if (document.getElementById('savepoint').innerHTML == 'Revert') {
+        document.getElementById('savepoint').innerHTML = 'Save'
+        gu4(true)
+        gu2(savepoint_blobs, true)
+        add_fiducials(savepoint_fiducials)
+        status_update(String(savepoint_blobs.length) + ' saved blobs and ' + String(savepoint_fiducials.length) + ' saved fiducials are plotted')
+
+
+        ispacked = savepoint_ispacked
+        savepoint_ispacked = false
+        savepoint_blobs = []
+        savepoint_fiducials = []
+        return 0
+
+      }
+
+    }
+
+    function purge_blobs() {
+      var C = find_true_refcorners()
+      var f = find_true_fiducials()
+      var F = C.concat(f)
+      var blobelements = hEl.elements;
+      var blobelementsid = []
+
+      for (var i = 0, n = blobelements.length; i < n; ++i) {
+        blobelementsid.push(blobelements[i].id)
+      }
+      blobelementsid = blobelementsid.filter(function (el) { return F.indexOf(el) < 0; });
+      hEl.removeElementsById(blobelementsid)
+    }
+
+    var viewer = OpenSeadragon({
+      id: 'foo',
+      prefixUrl: 'https://tmacroms-static.s3.us-east-2.amazonaws.com/main/images/',
+      tileSources: 'https://tmacroms.s3.us-east-2.amazonaws.com/stat_out_{{ ID }}/submitted_dzi.dzi',
+      maxZoomLevel: 100,
+      minZoomLevel: 0.5,
+      defaultZoomLevel: 1,
+      gestureSettingsMouse: { clickToZoom: false },
+      showNavigator: true,
+      navigatorPosition: "BOTTOM_LEFT",
+      zoomPerScroll: 1.4,
+      crossOriginPolicy: 'Anonymous',
+    });
+    viewer.addHandler('open', function () {
+      TIF_image_pixel_size_X = viewer.world.getItemAt(0).getContentSize().x;
+      TIF_image_pixel_size_Y = viewer.world.getItemAt(0).getContentSize().y;
+      boxsize = (TIF_image_pixel_size_Y + TIF_image_pixel_size_X) / 200
+      radiobuttonf()
+    });
+
+
+    var hEl = viewer.HTMLelements();
+
+
+    var selection = viewer.selection({
+      showSelectionControl: false,
+      allowRotation: false,
+      showConfirmDenyButtons: false,
+    });
+    selection.enable();
+
+
+    function radiobuttonf() {
+      var radiobutton1 = document.getElementById("radiobutton1");
+      if (radiobutton1.checked == true) {
+        blob_radio_selected = true;
+      } else {
+        blob_radio_selected = false;
+      }
+      var radiobutton2 = document.getElementById("radiobutton2");
+      if (radiobutton2.checked == true) {
+        fiducial_radio_selected = true;
+      } else {
+        fiducial_radio_selected = false;
+      }
+      var radiobutton3 = document.getElementById("radiobutton3");
+      if (radiobutton3.checked == true) {
+        roiremove_radio_selected = true;
+      } else {
+        roiremove_radio_selected = false;
+      }
+      var radiobutton4 = document.getElementById("radiobutton4");
+      if (radiobutton4.checked == true) {
+        viewer.canvas.focus();
+      }
+
+    }
+
+    function arraysEqual(a, b) {
+      if (a === b) return true;
+      if (a == null || b == null) return false;
+      if (a.length != b.length) return false;
+
+      a.sort()
+      b.sort()
+      for (var i = 0; i < a.length; ++i) {
+        if (a[i] !== b[i]) return false;
+      }
+      return true;
+    }
+
+    function switch_filtering_mode() {
+      var FilteringModeButton = document.getElementById("radiobutton5");
+      var section1 = document.getElementById("section1");
+      var section2 = document.getElementById("section2");
+
+      if (FilteringModeButton.checked == true) {
+        section1.style.display = 'none'
+        section2.style.display = 'inline'
+        document.getElementById("plotly-div").innerHTML = ''
+        document.getElementById('filter_selections').innerHTML = ''
+
+        blobs_before_filter = find_true_added_blobs()
+        blob_radio_selected = false;
+        fiducial_radio_selected = false;
+        roiremove_radio_selected = false;
+        status_update('Manual blob editing during filter mode is ignored')
+        var radList = document.getElementsByName('interaction_choice');
+        for (var i = 0; i < radList.length; i++) {
+          if (radList[i].checked) document.getElementById(radList[i].id).checked = false;
+        }
+
+      } else {
+        status_update('')
+
+        var array1 = blobs_before_filter
+        var array2 = find_true_added_blobs()
+        if (arraysEqual(array1, array2) == false) {
+          purge_blobs()
+          gu2(blobs_before_filter, true)
+        }
+        section2.style.display = 'none'
+        section1.style.display = 'inline'
+        document.getElementById('mincut').value = ''
+        document.getElementById('maxcut').value = ''
+        document.getElementById("Distance_button").style.display = 'none';
+        document.getElementById("Distance_button2").style.display = 'inline';
+      }
+
+
+    }
+
+    function measure_distance() {
+      if (blobs_before_filter.length < 2) {
+        alert('At least two or more blobs are required for distance measurements!')
+        return 0
+      }
+      if (blobs_before_filter.length > 20000) {
+        alert('Max limit is 20000 blobs!')
+        return 0
+      }
+      if (somethingisrunning == true) {
+        alert("This submission is ignored, server is still processing the previous submission! Please avoid double clicking on the button, or clicking the button before another job is finished. (i.e. clicking Circular Pack button right after clicking Run microMS button is prohibited)")
+        return 0
+      }
+      status_update('Measuring distances..')
+      somethingisrunning = true;
+
+
+
+
+
+      $.ajax({
+        headers: { "X-CSRFToken": token },
+        url: "8",
+        method: "POST",
+        data: {
+          csrf: token,
+          dziID: "{{ ID }}",
+          Blobs: blobs_before_filter.join('+')
+        },
+        dataType: "html",
+        success: function (response_text) {
+          somethingisrunning = false
+          blobs_before_filter = response_text.split('end');
+          gu4(false);
+          gu2(blobs_before_filter, true);
+          status_update('')
+          document.getElementById("Distance_button").style.display = 'inline';
+          document.getElementById("Distance_button").click();
+          document.getElementById("Distance_button2").style.display = 'none';
+
+        },
+        error: function (jqXHR, exception) {
+          somethingisrunning = false
+          status_update('')
+          var msg = '';
+          if (jqXHR.status === 0) {
+            msg = 'No connection. Verify network';
+          } else if (jqXHR.status == 404) {
+            msg = 'Requested page not found [404]';
+          } else if (jqXHR.status == 500) {
+            msg = 'Internal Server Error [500].';
+          } else if (exception === 'parsererror') {
+            msg = 'Requested parse failed.';
+          } else if (exception === 'timeout') {
+            msg = 'Time out error.';
+          } else if (exception === 'abort') {
+            msg = 'Ajax request aborted.';
+          } else {
+            msg = 'Uncaught Error.\n' + jqXHR.responseText;
+          }
+          alert(msg);
+        },
+        timeout: 250000,
+      });
+
+
+    };
+    document.getElementById('radiobutton5').checked = false;
+  </script>
+
+
+
+</body>
+
+</html>

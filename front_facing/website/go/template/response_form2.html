@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]> <html class="lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>macroMS :: Web Tool</title>
+
+  <link href="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/bootstrap.min.css" rel="stylesheet">
+  <link href='https://tmacroms-static.s3.us-east-2.amazonaws.com/main/font' rel='stylesheet' type='text/css'>
+  <link href="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/jumbotron.css" rel="stylesheet">
+
+  <script src="js/ie-emulation-modes-warning.js"></script>
+
+</head>
+<script src="/static/jquery-3.1.1.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $.get("4", function (response_text) {
+      $('#td2').text(response_text);
+    });
+  });
+
+</script>
+
+<body>
+  <div class="jumbotron" style="padding-top:0px;padding-bottom:10px">
+    <div class="container">
+      <div class="media">
+        <div class="media-body">
+          <h3><a class="jumbolink">macroMS :: Web Tool</a></h3>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="col-md-2">
+        <p>Welcome to the <strong>macroMS Web Tool</strong>. We hope this serves as a convenient portal for job
+          submission.</p>
+        <p><strong># jobs submitted: <a id=td2> </a></strong></p>
+
+      </div>
+      <div class="col-md-10">
+        <h2>macroMS Job Submission</h2>
+
+        <form method="get" action="https://macroms.scs.illinois.edu">
+          <div class="alert alert-danger">Whoa, pardner. Looks like something went wrong.</div>
+          <p>-Check your file extension is jpg, jpeg, png, tif, tiff, or txt. </p>
+          <p>-Check if your txt file is less than 1 MB and was downloaded from macroMS distortion measurement </p>
+          <p>-Check your file's pixel size is within the maximal limit (300,000,000) by right click -> properties </p>
+          <p>-Check if your file's name includes non-standard characters. Standard letters are 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~ \t\n\r\x0b\x0c </p>
+          <p>-Check if your file is a broken corrupted image by opening</p>
+
+
+
+
+          <p class="remember_me">
+          </p>
+
+
+          <p class="submit"><input type="submit" name="commit" value="Return"></p>
+        </form>
+      </div>
+    </div>
+    <hr>
+    <footer>
+      <p>This project is developed by the <a href="http://faculty.scs.illinois.edu/sweedler/">Sweedler Research Lab</a>
+        at the University of Illinois at Urbana-Champaign. &copy; 2020<br>This project is funded by <a
+          href="https://cabbi.bio/">Center for Advanced Bioenergy and Bioproducts Innovation</a> and is powered by <a
+          href="http://neuroproteomics.scs.illinois.edu/microMS.htm">microMS</a> </p>
+
+    </footer>
+
+  </div>
+</body>
+
+</html>

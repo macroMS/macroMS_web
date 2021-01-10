@@ -1,0 +1,3 @@
+cd celery
+nohup celery -A celery_worker worker -Q celery -n wk2  -f /home/ubuntu/website/go/celery.txt &
+nohup celery -A celery_worker worker -Q feature_recognition,celery -n wk1 -f /home/ubuntu/website/go/celery_featurereq.txt &

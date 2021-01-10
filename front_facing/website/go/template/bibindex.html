@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>macroMS</title>
+
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/plotly-latest.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragon.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/OpenSeadragonHTMLelements.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/jquery-3.1.1.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragonmagnifier.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragonselection.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/download.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/papaparse.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragon-filtering.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/openseadragon-svg-overlay.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/d3.v6.js"></script>
+
+  <style>
+    .longtext {
+
+
+      width: calc(100% - 20px);
+      padding: 2px;
+      border-radius: 3px;
+      margin: 3px;
+    }
+
+    button {
+      padding: 2px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4286f4;
+      color: white;
+      cursor: pointer;
+      margin: 3px;
+    }
+
+    .button {
+      padding: 2px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4286f4;
+      color: white;
+      cursor: pointer;
+      margin: 3px;
+    }
+
+    .lab {
+      margin-left: 5px;
+      margin-right: 5px;
+
+    }
+
+    select {
+      margin-left: 5px;
+      margin-bottom: 5px;
+
+    }
+
+    header {
+    width: 1200px;
+    font-size:15px;
+
+  background-color: black; 
+  text-align: left;
+  color: white;
+  padding-bottom: 2px;
+}
+
+/* Create two columns/boxes that floats next to each other */
+nav {
+  float: left;
+  width: 800px;
+  height: 100%; /* only for demonstration, should be removed */
+  background: white;
+  color: white
+}
+
+ 
+
+article {
+  float: left;
+  font-size:15px;
+  height: 725px;
+  width: 400px;
+  background-color: #f1f1f1;
+position: sticky;
+
+ }
+ body {
+  padding: 0;
+  margin: 0;
+}
+input[type="file"] {
+    display: none;
+}
+ 
+  </style>
+</head>
+
+<body style="background:white">
+
+   <div style="width: 1200px; ">
+  <header >
+    <div  id='header1' >
+    <a  id='mark_corner_flag' >Edit blobs</a> <input type='radio' name='interaction_choice' id='radiobutton1' onclick='radiobuttonf()'
+        checked>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Edit fiducials <input type='radio' name='interaction_choice' id='radiobutton2'
+        onclick='radiobuttonf()'>&nbsp;&nbsp;&nbsp; 
+      Box remove <input type='radio' name='interaction_choice' id='radiobutton3' onclick='radiobuttonf()'>
+      &nbsp;&nbsp;&nbsp; 
+      Set ROI <input type='radio' name='interaction_choice' id='radiobutton6' onclick='radiobuttonf()'>
+      &nbsp;&nbsp;&nbsp; 
+      Navigation <input type='radio' name='interaction_choice' id='radiobutton4' onclick='radiobuttonf()'>
+      &nbsp;&nbsp;&nbsp; 
+      Filtering <input type='checkbox' id='radiobutton5' onclick='switch_filtering_mode()'>
+      <a id='Satus_bar' style='float:right;padding:5px;height:15px; font-size:15px;'></a>
+      </div>
+    
+  </header>
+  <section>
+    <nav>
+      <div> 
+      <div id="section5" style="height:700px;width:800px;float:left;cursor:crosshair;display:inline;"></div>
+      <a id='Satus_bar2' style='float:left;padding:5px;height:15px;width:800px;background-color:black;font-size:15px;'>  Input image : {{ image_name }}</a>
+
+      </div>
+      <div id="section3" style="display:none;">
+  
+        <div id="section3_1" style="height:650px;width:800px;cursor:crosshair "></div> 
+        <div id="section3_2" style="height:650px;width:800px;cursor:crosshair "></div>
+  
+      </div>    
+    </nav>
+    
+    <article> 
+      <div id='section1' style="background-color:#eee;height:100%;width:400px;float:left;display:inline;">
+
+        <div id='section6'>
+          <button onclick=update_blobs_status()>Count</button><button id='savepoint1' onclick=Savepoint()>Savepoint</button><button id='savepoint2' >Save session</button><label for="file-upload" class="button" title="For inputing targets generated from other software such as OpenCFU. Input CSV file lists comma-deliminated or tab-deliminated coordinate of targets that are identified from the current input image. The first and the second column are X Y pixel cordinates of the center of the target box. The third column is the width of the target box in pixels. The optional fourth column is group number of the target. Up to 1000 targets can be loaded. One example line for one target can be: 2561.6,6123.3,25.2,1 Some source may only report the X Y coordinate of the top left corner edge of the boxes, in this case, half of the third column may need to be added/subtracted to the first and second column.">Load CSV</label><input id="file-upload" type="file"/><button onclick=gu5()>Reset</button>
+        </div> <br>
+  
+  
+        <input hidden type="checkbox" id="Image_Threasholding" name="Image_Threasholding" onclick='Image_Threasholding()' checked>
+          <a class='lab'> Color channel for threshold </a> 
+         <select id='threshold_color' onchange=update_threshold()>
+         <option value='-1'>No threshold</option>
+         <option value='0' >Gray</option>
+         <option value='1'>Red</option>
+         <option value='2'>Green</option>
+         <option value='3'>Blue</option>
+         <option value='4'>Gray-inverse</option>
+         <option value='5'>Red-inverse</option>
+         <option value='6'>Green-inverse</option>
+         <option value='7'>Blue-inverse</option>
+         </select> <button onclick='switch_to_reg()'>↕</button> <br>
+         <a class='lab'> Threshold </a>   
+        <input id='threshold_selector' type='range' min='1' max='255'   style='margin:0 auto' oninput=update_threshold()><a id='threshold_value'>128</a><br><br> 
+        
+        <a class='lab'>Minimal size of features</a><a style="color:#808080">(Greater than 0) </a><br>
+        <input  class='longtext'  type="text" pattern="^[0-9]*$" id="minSize" value="100"><br>
+        <a class='lab'>Maximal size of features</a><a style="color:#808080">(Greater than 0) </a><br>
+        <input  class='longtext'  type="text" pattern="^[0-9]*$" id="maxSize" value="5000"><br>
+        <a class='lab'>Minimal circularity of features</a><a style="color:#808080">(0~1) </a><br>
+        <input  class='longtext'  type="text" pattern="^[0-9.]*$" id="minCircularity" value="0"><br>
+        <div hidden><a class='lab'>Threshold</a><a style="color:#808080">(0~200) </a><br>
+        <input type="text" pattern="^[0-9]*$" id="threshold" value="75"><br></div>
+ 
+  
+        <button id='Run_microms'>Perform feature finding</button>         
+         <a class='lab' hidden>Color channel</a>
+        <select id="colorChannel" hidden>
+          <option value="2">Blue</option>
+          <option value="0">Red</option>
+          <option value="1">Green</option>
+  
+        </select>&nbsp;    
+   <br><br>
+  
+        <input type="text" pattern="^[0-9.]*$" id="W_H_Ratio" value="3" hidden>
+        <a class='lab'>Offset for circular packing:</a><a style="color:#808080">(-2,-1,0,1,2) </a>
+        <input type="text" pattern="^-?[0-9]*$" style='margin:2px;padding:2px;border-radius: 3px;width:200px' id="pack_offset" value="-1"> 
+        <button id='circular_pack'>Circular pack</button> <br><br>
+  
+        <input type="checkbox" id="Array_mode" name="Array_Mode" onclick='Array_mode_Prep()'>
+        <label for="Array_Mode"> Register grid array (requires marking corners)   </label><br>
+        
+        <div id='Array_mode_options' style='display:none'>
+        <a class='lab'>Number of rows</a>
+        <input type='text'  style='width:30%;margin:3px;padding:2px;border-radius: 3px;'   pattern='^[0-9]*$' id='RowN' ><br>
+        <a class='lab'>Number of columns</a>
+        <input type='text' style='width:30%;margin:3px;padding:2px;border-radius: 3px;'  pattern='^[0-9]*$' id='ColN' ><br>
+        <a class='lab' style='display:none' id='sample_fontsize_label' >Font size for loaded names</a>
+        <input type='text' style='width:30%;margin:3px;padding:2px;border-radius: 3px;display:none'  pattern='^[.0-9]*$' id='sample_fontsize' value="10" >
+        <button id='array_register' >Register array</button><button id='array_addition' >Add array</button><button onclick=plot_registration() id='plot_registered_colrow_button' style='display:none' >Plot registration</button><button onclick=revert_to_canvas() id='plot_registered_array_error'  style='display:none'>Check error</button><div id='load_registered_array_sample_names_id' style='display:none'><label for="file-upload2" class="button" title="Max character length for names is 27">Load names</label><input id="file-upload2" type="file"/></div>
+
+
+         </div> <br><br>
+   
+   
+        <input type="checkbox" id="horizontal_flip_geometry" name="geometry_options" title="For case when glass+sample is imaged from bottom up" >
+        <label for="geometry_options" title="For case when glass+sample is imaged from bottom up" > Mirror across vertical axis</label><br>
+        <input type="checkbox" id="TSO_geometry" name="geometry_options" title="Highly recommedned for &gt; 5,000 blobs. Takes up to 1 minute." >
+        <label for="geometry_options" title="Highly recommedned for &gt; 5,000 blobs. Takes up to 1 minute." > MALDI path optimize (runs 1 min.) </label><br>
+        <select id="platetype">
+          <option value="1"></option>
+          <option value="MTP384">MTP 384 Steel (Chipless)</option>
+          <option value="PAC">PAC 384 </option>
+          <option value="TLC">MTP TLC </option>
+ 
+        </select>
+        <label for="platetype"> MALDI plate type </label><br>
+  
+        <a class='lab' title="4 fiducials are required for a camera image" >Glass width/height if image is from camera :</a>
+  
+        <input type="text" class='longtext'  id="adjust_dimensions" name="adjust_dimensions" pattern="^[0-9.]*$" placeholder="Width divided by height"  title="4 fiducials are required for a camera image" ><br>
+        <button id='geometryf'>Generate coordinate file</button> 
+        
+  
+  
+      </div>
+  
+      <div id='section2' style="background-color:#eee;height:700px;width:400px;float:left;display:none;">
+        <div id='graphbuttons'>
+          <button name='filter_choice' value='1' onclick=filter_graph(0)>Size</button>&nbsp;
+          <button name='filter_choice' value='2' onclick=filter_graph(1)>Circularity</button>&nbsp;
+          <button name='filter_choice' value='3' onclick=filter_graph(2) id="Distance_button"
+            style="display:none;">Distance</button>&nbsp;
+          <button onclick='measure_distance()'
+            title="Can take longer than 1 min for &gt; 2,000 blobs"  id="Distance_button2" style="display:inline;">Set up distance filter</button>
+  
+        </div>
+        <div class='lab' id="plotly-div"></div>
+        <div id="filter_selections"></div>
+  
+  
+      </div>
+      <div id='section_plot' style='display:none'>
+        <br><a style='margin:5px' >Input data</a><br>
+        <textarea id="Bloblist"  rows="10" cols="45" style='margin:5px' placeholder="example &#10;0_0_1171.304_1422.475_77_45.461 3&#10;0_0_371.504_162.475_77_45.461 9&#10;0_0_613.504_812.475_77_45.461 5"  title="Formatting: First column is full file name such as '0_0_1171.304_1422.475_77_45.461' and the optional second column is the value associated with the file name which will be used for making heatmap. The columns are tab-deliminated. Cutting and pasting from an excel spreadsheet is recommended. The plotting can be used for visualizing an output of data analysis by an external software or macroMS output with expired web links"></textarea><br>
+      <button onclick='show_multiple()'>Show samples</button> <button onclick=gu6()>Reset</button><br>
+      
+      </div>
+    </article>
+  </section>
+    </div>
+
+
+    <br> 
+   <script>
+
+ 
+    var RefIMG = "{{ RefImg }}"
+    var token = '{{csrf_token}}';
+    var Revisit = "{{ Revisit }}"
+    var image_name = "{{ image_name }}"
+    var plotmode ="{{ plot_mode }}"
+    var folder_ID ="{{ ID }}"
+ 
+    </script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/macroMS_main.js"></script>
+     
+
+
+
+</body>
+
+</html>

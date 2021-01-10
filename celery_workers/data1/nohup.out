@@ -1,0 +1,185 @@
+ 
+ -------------- celery@wk1 v4.4.2 (cliffs)
+--- ***** ----- 
+-- ******* ---- Linux-5.4.0-1029-aws-x86_64-with-debian-buster-sid 2020-11-25 00:33:44
+- *** --- * --- 
+- ** ---------- [config]
+- ** ---------- .> app:         tasks:0x7f80ff2260b8
+- ** ---------- .> transport:   amqp://worker1:**@172.31.19.15:5672/macroMS_host
+- ** ---------- .> results:     amqp://
+- *** --- * --- .> concurrency: 2 (prefork)
+-- ******* ---- .> task events: OFF (enable -E to monitor tasks in this worker)
+--- ***** ----- 
+ -------------- [queues]
+                .> celery           exchange=celery(direct) key=celery
+                .> feature_recognition exchange=feature_recognition(direct) key=feature_recognition
+
+/usr/local/lib/python3.5/site-packages/celery/platforms.py:801: RuntimeWarning: You're running the worker with superuser privileges: this is
+absolutely not recommended!
+
+Please specify a different user using the --uid option.
+
+User information: uid=0 euid=0 gid=0 egid=0
+
+  uid=uid, euid=euid, gid=gid, egid=egid,
+/usr/local/lib/python3.5/site-packages/celery/backends/amqp.py:67: CPendingDeprecationWarning: 
+    The AMQP result backend is scheduled for deprecation in     version 4.0 and removal in version v5.0.     Please use RPC backend or a persistent backend.
+
+  alternative='Please use RPC backend or a persistent backend.')
+
+worker: Warm shutdown (MainProcess)
+Traceback (most recent call last):
+  File "/usr/local/bin/celery", line 8, in <module>
+    sys.exit(main())
+  File "/usr/local/lib/python3.5/site-packages/celery/__main__.py", line 16, in main
+    _main()
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 322, in main
+    cmd.execute_from_commandline(argv)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 495, in execute_from_commandline
+    super(CeleryCommand, self).execute_from_commandline(argv)))
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/base.py", line 305, in execute_from_commandline
+    return self.handle_argv(self.prog_name, argv[1:])
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 487, in handle_argv
+    return self.execute(command, argv)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 419, in execute
+    ).run_from_argv(self.prog_name, argv[1:], command=argv[0])
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/worker.py", line 223, in run_from_argv
+    return self(*args, **options)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/base.py", line 253, in __call__
+    ret = self.run(*args, **kwargs)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/worker.py", line 258, in run
+    **kwargs)
+  File "/usr/local/lib/python3.5/site-packages/celery/worker/worker.py", line 101, in __init__
+    self.setup_instance(**self.prepare_args(**kwargs))
+  File "/usr/local/lib/python3.5/site-packages/celery/worker/worker.py", line 134, in setup_instance
+    self.on_init_blueprint()
+  File "/usr/local/lib/python3.5/site-packages/celery/apps/worker.py", line 120, in on_init_blueprint
+    self._custom_logging = self.setup_logging()
+  File "/usr/local/lib/python3.5/site-packages/celery/apps/worker.py", line 167, in setup_logging
+    redirect_stdouts=False, colorize=colorize, hostname=self.hostname,
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 68, in setup
+    loglevel, logfile, colorize=colorize, hostname=hostname,
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 115, in setup_logging_subsystem
+    root, logfile, loglevel, format, colorize, **kwargs
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 153, in _configure_logger
+    colorize, **kwargs)
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 218, in setup_handlers
+    handler = self._detect_handler(logfile)
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 228, in _detect_handler
+    return WatchedFileHandler(logfile)
+  File "/usr/local/lib/python3.5/logging/handlers.py", line 434, in __init__
+    logging.FileHandler.__init__(self, filename, mode, encoding, delay)
+  File "/usr/local/lib/python3.5/logging/__init__.py", line 1014, in __init__
+    StreamHandler.__init__(self, self._open())
+  File "/usr/local/lib/python3.5/logging/__init__.py", line 1043, in _open
+    return open(self.baseFilename, self.mode, encoding=self.encoding)
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/celery_featurereq1.txt'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/packer.py", line 39, in <module>
+    blobfile_maker(blobs,blobf)
+  File "/home/ubuntu/macroMS/packer.py", line 35, in blobfile_maker
+    blobff=open(blobf,'w') 
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/efs/Z914364770419259/blobs.txt'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/packer.py", line 39, in <module>
+    blobfile_maker(blobs,blobf)
+  File "/home/ubuntu/macroMS/packer.py", line 35, in blobfile_maker
+    blobff=open(blobf,'w') 
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/efs/Z914364770419259/blobs.txt'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/packer.py", line 39, in <module>
+    blobfile_maker(blobs,blobf)
+  File "/home/ubuntu/macroMS/packer.py", line 35, in blobfile_maker
+    blobff=open(blobf,'w') 
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/efs/Z914364770419259/blobs.txt'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/packer.py", line 39, in <module>
+    blobfile_maker(blobs,blobf)
+  File "/home/ubuntu/macroMS/packer.py", line 35, in blobfile_maker
+    blobff=open(blobf,'w') 
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/efs/Z914364770419259/blobs.txt'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/packer.py", line 39, in <module>
+    blobfile_maker(blobs,blobf)
+  File "/home/ubuntu/macroMS/packer.py", line 35, in blobfile_maker
+    blobff=open(blobf,'w') 
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/efs/Y463584712823415/blobs.txt'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/packer.py", line 39, in <module>
+    blobfile_maker(blobs,blobf)
+  File "/home/ubuntu/macroMS/packer.py", line 35, in blobfile_maker
+    blobff=open(blobf,'w') 
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/efs/Y463584712823415/blobs.txt'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <module>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <listcomp>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+ValueError: could not convert string to float: '0.kjkbjkjb'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <module>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <listcomp>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+ValueError: could not convert string to float: '0.kjkbjkjb'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <module>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <listcomp>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+ValueError: could not convert string to float: '-0.01244068626121475\x0c11.271'
+Traceback (most recent call last):
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <module>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+  File "/home/ubuntu/macroMS/geometry-maker.py", line 84, in <listcomp>
+    vals_y=np.array([float(q[3]) for q in out],dtype=np.double)
+ValueError: could not convert string to float: '-0.01244068626121475\x0c11.271'
+Traceback (most recent call last):
+  File "/usr/local/bin/celery", line 8, in <module>
+    sys.exit(main())
+  File "/usr/local/lib/python3.5/site-packages/celery/__main__.py", line 16, in main
+    _main()
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 322, in main
+    cmd.execute_from_commandline(argv)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 495, in execute_from_commandline
+    super(CeleryCommand, self).execute_from_commandline(argv)))
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/base.py", line 305, in execute_from_commandline
+    return self.handle_argv(self.prog_name, argv[1:])
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 487, in handle_argv
+    return self.execute(command, argv)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/celery.py", line 419, in execute
+    ).run_from_argv(self.prog_name, argv[1:], command=argv[0])
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/worker.py", line 223, in run_from_argv
+    return self(*args, **options)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/base.py", line 253, in __call__
+    ret = self.run(*args, **kwargs)
+  File "/usr/local/lib/python3.5/site-packages/celery/bin/worker.py", line 258, in run
+    **kwargs)
+  File "/usr/local/lib/python3.5/site-packages/celery/worker/worker.py", line 101, in __init__
+    self.setup_instance(**self.prepare_args(**kwargs))
+  File "/usr/local/lib/python3.5/site-packages/celery/worker/worker.py", line 134, in setup_instance
+    self.on_init_blueprint()
+  File "/usr/local/lib/python3.5/site-packages/celery/apps/worker.py", line 120, in on_init_blueprint
+    self._custom_logging = self.setup_logging()
+  File "/usr/local/lib/python3.5/site-packages/celery/apps/worker.py", line 167, in setup_logging
+    redirect_stdouts=False, colorize=colorize, hostname=self.hostname,
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 68, in setup
+    loglevel, logfile, colorize=colorize, hostname=hostname,
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 115, in setup_logging_subsystem
+    root, logfile, loglevel, format, colorize, **kwargs
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 153, in _configure_logger
+    colorize, **kwargs)
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 218, in setup_handlers
+    handler = self._detect_handler(logfile)
+  File "/usr/local/lib/python3.5/site-packages/celery/app/log.py", line 228, in _detect_handler
+    return WatchedFileHandler(logfile)
+  File "/usr/local/lib/python3.5/logging/handlers.py", line 434, in __init__
+    logging.FileHandler.__init__(self, filename, mode, encoding, delay)
+  File "/usr/local/lib/python3.5/logging/__init__.py", line 1014, in __init__
+    StreamHandler.__init__(self, self._open())
+  File "/usr/local/lib/python3.5/logging/__init__.py", line 1043, in _open
+    return open(self.baseFilename, self.mode, encoding=self.encoding)
+PermissionError: [Errno 13] Permission denied: '/home/ubuntu/celery_featurereq1.txt'
+convert-im6.q16: unable to open image `/home/ubuntu/efs/S463584021978188/input.png': No such file or directory @ error/blob.c/OpenBlob/2701.
+convert-im6.q16: no images defined `/home/ubuntu/efs/S463584021978188/input.tif' @ error/convert.c/ConvertImageCommand/3258.
+VipsForeignLoad: file "/home/ubuntu/efs/S463584021978188/input.tif" not found
