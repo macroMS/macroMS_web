@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]> <html class="lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en">
+<!--<![endif]-->
+
+<head>
+  <title>macroMS</title>
+
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/jquery-3.1.1.min.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/aws-sdk.js"></script>
+  <script src="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/macroMS_frontpage.js"></script>
+
+ 
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>macroMS</title>
+  <link href="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/bootstrap.min.css" rel="stylesheet">
+
+  <link
+    href="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/css?family=Lora:400,400italic,700,700italic|Lato:400,400italic,700italic,700"
+    rel='stylesheet' type='text/css'>
+
+  <link href="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/jumbotron.css" rel="stylesheet">
+
+
+</head>
+ 
+
+<body onunload="RReset()">
+  <div class="jumbotron" style="padding-top:0px;padding-bottom:10px">
+    <div class="container">
+      <div class="media">
+        <div class="media-body">
+          <h3><a class="jumbolink">macroMS Web Server </a></h3>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+      <div class="col-md-2">
+        <p>Welcome to the <strong>macroMS Web Tool</strong>. We hope this serves as a convenient portal for job
+          submission.</p>
+
+        <p><strong># images submitted: <a id=td2> </a></strong></p>
+
+         <p><em>Note:</em> recent (2017~) versions of FireFox or Chrome browsers are recommended</p> 
+
+         <p class="text-muted"><mark><em>Note:</em> Please reference instruction <a
+            href="https://kisurbc2.gitbook.io/macroms/"  target="_blank">manual</a> and <a
+            href="https://www.youtube.com/watch?v=OckpuZsUfSg"  target="_blank">video</a> walkthrough</mark></p> 
+
+ 
+ 
+
+      </div>
+      <div class="col-md-10">
+        <h2>macroMS Job Submission </h2>
+        <form method="post" action="{{ jobID }}" enctype="multipart/form-data" id='form1'>{% csrf_token %}
+          <div class="col-md-5">
+            <h3>Input image file</h3>
+            <div class="form-group">
+              <label>JPG/PNG/TIF image file</label>
+              <input type="file" name="-l" id="image1" onchanmacroMSge="checksize(0)" required>
+              <p class="help-block">Size limit: 30,000,000 total pixels (4.84 inch &sup2; at 2400dpi)</p>
+              <label>(Optional) JPG/PNG/TIF image of a distortion target grid, or TXT file of measurement output for the image</label>
+                <input type="file" name="-l2" id="image2" onchange="checksize(1)">
+                <p class="help-block">Same pixel size and physical area as the above image</p>
+              <input type="checkbox" id="plotmode" name="plotmode" value="yes">
+              <label for="plotmode"> Data plot mode</label>
+                <p class="help-block">Locate samples and plot data for a previously processed image. Can plot analysis by external software. </p>
+            </div>
+
+            <p class="submit"><input type="button" value="Submit image" onclick='Submit()'>&nbsp;&nbsp;&nbsp;<input
+                type="reset"> </p>
+            <div id='image_upload_status'></div>
+
+          </div>
+        </form>
+
+        <div class="col-md-5">
+          <form>
+            <h3>Data analysis</h3>
+            <div class="form-group">
+              <label for="acclist">Zipped fid files </label>
+              <input type="file" name="-l" id="fidfs" required>
+              <p class="help-block">File size up to 3.5GB with 1,000 m/z max mass range </p>
+
+            </div>
+            <div class="form-group">
+              <label for="acclist">JPG/PNG/TIF file</label>
+              <input type="file" name="-l" id="imagef" required>
+              <p class="help-block">The exact image file used for the above data </p>
+            </div>
+
+            <div class="form-group">
+              <label for="acclist">Txt file of m/z ranges for analysis</label>
+              <input type="file" name="-l" id="rangef" required>
+              <p class="help-block"> Up to 10 m/z ranges listed in a vertical row. Exact formatting needed <a
+                  href="https://tmacroms-static.s3.us-east-2.amazonaws.com/main/example.txt">example</a> </p>
+
+            </div>
+            <label for="fname">Email address</label>
+            <input type="text" id="email" pattern="^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$" required>
+            <p class="help-block"> For delivery of results. </p>
+            <p class="help-block"> Please avoid uploading from multiple windows. </p>
+
+            <p class="submit"><input type="button" name="commit" value="Submit data"
+                onclick='submit_s3() '>&nbsp;&nbsp;&nbsp;<input type="reset"> </p>
+           <div id='progress_bar'>
+            <a id='progress1'></a><br>
+            <a id='progress2'></a><br>
+            <a id='progress3'></a><br>
+           </div>
+
+
+          </form>
+
+        </div>
+
+      </div>
+    </div>
+
+    <hr>
+    <footer>
+      <p>This project is developed by the <a href="http://faculty.scs.illinois.edu/sweedler/">Sweedler Research Lab</a>
+        at the University of Illinois at Urbana-Champaign. &copy; 2020<br>This project is funded by <a
+          href="https://cabbi.bio/">Center for Advanced Bioenergy and Bioproducts Innovation</a> and uses <a
+          href="http://neuroproteomics.scs.illinois.edu/microMS.htm">microMS</a> </p>
+    </footer>
+
+  </div> 
+
+
+</body>
+
+</html>
